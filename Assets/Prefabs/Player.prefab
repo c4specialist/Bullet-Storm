@@ -12,7 +12,11 @@ GameObject:
   - component: {fileID: 7962397294120088542}
   - component: {fileID: 7902946744950781971}
   - component: {fileID: 973238633390502092}
-  - component: {fileID: 8830137752344384162}
+  - component: {fileID: 5407945981034294740}
+  - component: {fileID: 2086648637659952996}
+  - component: {fileID: 5654124545425951238}
+  - component: {fileID: 230507189563590404}
+  - component: {fileID: 2737322855707782241}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -150,7 +154,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &8830137752344384162
+--- !u!114 &5407945981034294740
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,12 +163,68 @@ MonoBehaviour:
   m_GameObject: {fileID: 3327116366427596140}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef370bb0f5a7e534382a1af50a38fd81, type: 3}
+  m_Script: {fileID: 11500000, guid: 4f7f6035effe4c142a4b979c491d8c1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 100
+  healthBar: {fileID: 0}
+--- !u!114 &2086648637659952996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3327116366427596140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dde3213f9885bb1429c88d75004c015b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  sprintSpeed: 8
   rb: {fileID: 973238633390502092}
+--- !u!114 &5654124545425951238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3327116366427596140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 452c7ed3905227d46a4fb55fde6ddb8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxStamina: 100
+  staminaDrainRate: 20
+  staminaRegenRate: 20
+  staminaBar: {fileID: 0}
+--- !u!114 &230507189563590404
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3327116366427596140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70378bf222b36b046b824abe82964d7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   weapon: {fileID: 8875770698512608877}
+--- !u!114 &2737322855707782241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3327116366427596140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c8a3df0cf96594d8c956a8ce7944aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7987959262031288487
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,8 +351,8 @@ Transform:
   m_GameObject: {fileID: 8109342221318374423}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.21, y: 0.517, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.13, y: 0.517, z: 0}
+  m_LocalScale: {x: 1.0305572, y: 1.1697264, z: 1.1274471}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6345980213354856195}

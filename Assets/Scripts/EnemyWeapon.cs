@@ -31,7 +31,12 @@ public class EnemyWeapon : MonoBehaviour
     {
         GameObject EnemyBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
         Rigidbody2D rb = EnemyBullet.GetComponent<Rigidbody2D>();
-        rb.velocity = firePoint.right * bulletSpeed; // Adjust for firePoint orientation
+        
+        if (rb != null)
+    {
+        rb.velocity = firePoint.right * bulletSpeed; // Ensure correct direction
+    }
+
     }
     
 }
