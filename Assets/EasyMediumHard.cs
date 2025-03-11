@@ -4,22 +4,20 @@ using TMPro;
 
 public class DifficultySlider : MonoBehaviour
 {
-    [Header("UI Components")]
-    public Slider difficultySlider; // Reference to the slider
-    public TMP_Text difficultyText; // Reference to the TextMeshPro display
+    public Slider difficultySlider; 
+    public TMP_Text difficultyText; 
 
     void Start()
     {
-        // Ensure the slider's value is within bounds and update text at the start
+        
         difficultySlider.minValue = 0;
         difficultySlider.maxValue = 2;
-        difficultySlider.wholeNumbers = true; // Slider snaps to whole numbers
-        UpdateDifficultyText(); // Initialize the text
+        difficultySlider.wholeNumbers = true; 
+        UpdateDifficultyText(); 
     }
 
     public void UpdateDifficultyText()
     {
-        // Update the text based on the slider's value
         switch ((int)difficultySlider.value)
         {
             case 0:

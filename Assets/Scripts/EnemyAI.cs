@@ -4,52 +4,71 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    public GameObject player;       // Reference to the player
-    public float speed;             // Movement speed of the AI
-    public float detectionRadius;   // Radius within which the AI detects the player
-    public float stoppingDistance;  // Distance at which the AI stops moving
-    public LayerMask obstacleLayer; // LayerMask for walls or obstacles
+    public GameObject player;       
+    public float speed = 2f;             
+    public float detectionRadius = 5f;   
+    public float stoppingDistance = 1.5f; 
+    public LayerMask obstacleLayer; 
 
-    private float distance;         // Distance between AI and player
+    private Rigidbody2D rb;  
+    private float distance;         
+    private bool canShoot = false;
 
-    void Update()
+    void Start()
     {
-        // Calculate distance to the player
+        rb = GetComponent<Rigidbody2D>();
+        rb.isKinematic = true; // ✅ Use Kinematic Rigidbody
+    }
+
+    void FixedUpdate()
+    {
         distance = Vector2.Distance(transform.position, player.transform.position);
 
-        // Check if the player is within the detection radius and has line of sight
         if (distance <= detectionRadius && HasLineOfSight())
         {
-            // Rotate toward the player
-            Vector2 direction = player.transform.position - transform.position;
+            Debug.Log("✅ Player detected! Moving...");
+
+            Vector2 direction = (player.transform.position - transform.position).normalized;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-            
-            // Move toward the player if outside the stopping distance
+            transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+
             if (distance > stoppingDistance)
             {
-                transform.position = Vector2.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+                Vector2 newPosition = rb.position + direction * speed * Time.fixedDeltaTime;
+
+                // ✅ Check for walls before moving
+                if (!IsBlocked(newPosition))
+                {
+                    rb.MovePosition(newPosition);
+                }
             }
+
+            canShoot = true;
+        }
+        else
+        {
+            canShoot = false;
         }
     }
 
     bool HasLineOfSight()
     {
-
-        Vector2 direction = player.transform.position - transform.position;
+        Vector2 direction = (player.transform.position - transform.position).normalized;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, detectionRadius, obstacleLayer);
 
-        // Debugging: Draw the ray in Scene View
-        Debug.DrawRay(transform.position, direction.normalized * detectionRadius, Color.red, 0.1f);
+        Debug.DrawRay(transform.position, direction * detectionRadius, Color.red);
 
-        // If the ray hits an obstacle before reaching the player, return false
-        if (hit.collider != null)
-        {
-            Debug.Log("Raycast hit: " + hit.collider.gameObject.name); // Check what object is being hit
-            return false;
-        }
-
-        return true;
+        return hit.collider == null || hit.collider.gameObject == player;
     }
 
+    bool IsBlocked(Vector2 targetPosition)
+    {
+        Collider2D hit = Physics2D.OverlapCircle(targetPosition, 0.1f, obstacleLayer);
+        return hit != null;
+    }
+
+    public bool CanShoot()
+    {
+        return canShoot;
+    }
 }

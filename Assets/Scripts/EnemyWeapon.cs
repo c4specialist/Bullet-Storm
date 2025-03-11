@@ -10,18 +10,33 @@ public class EnemyWeapon : MonoBehaviour
 
     private float nextFireTime = 0f;
     private Transform player;
+    private EnemyAI enemyAI;
 
-    private void Start()
+    void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        enemyAI = GetComponentInParent<EnemyAI>();
+
+        if (enemyAI == null)
+        {
+            Debug.LogError("EnemyAI NOT FOUND!");
+        }
+        else
+        {
+            Debug.Log("EnemyAI FOUND: " + enemyAI.gameObject.name);
+        }
     }
 
     private void Update()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer <= shootRange && Time.time >= nextFireTime)
+        Debug.Log("Trying to shoot: " + (enemyAI.CanShoot() ? "YES" : "NO"));
+
+        // 🔹 Only shoot when the enemy sees the player
+        if (distanceToPlayer <= shootRange && enemyAI != null && enemyAI.CanShoot() && Time.time >= nextFireTime)
         {
+            Debug.Log("Shooting!");
             Shoot();
             nextFireTime = Time.time + 1f / fireRate;
         }
@@ -29,14 +44,26 @@ public class EnemyWeapon : MonoBehaviour
 
     void Shoot()
     {
-        GameObject EnemyBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-        Rigidbody2D rb = EnemyBullet.GetComponent<Rigidbody2D>();
-        
-        if (rb != null)
-    {
-        rb.velocity = firePoint.right * bulletSpeed; // Ensure correct direction
-    }
+        if (bulletPrefab == null)
+        {
+            Debug.LogError("BulletPrefab NOT Assigned!");
+            return;
+        }
 
+        GameObject enemyBullet = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+        Debug.Log("Bullet instantiated!");
+
+        Rigidbody2D rb = enemyBullet.GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            Vector2 direction = (player.position - firePoint.position).normalized;
+            rb.velocity = direction * bulletSpeed;  // ✅ Ensure bullet moves toward player
+            Debug.Log("Bullet moving!");
+        }
+        else
+        {
+            Debug.LogError("Bullet has no Rigidbody2D!");
+        }
     }
-    
 }
