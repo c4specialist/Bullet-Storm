@@ -6,13 +6,14 @@ public class EnemyAI : MonoBehaviour
 {
     public GameObject player;       
     public float speed = 2f;             
-    public float detectionRadius = 5f;   
+    public float detectionRadius = 3f;   
     public float stoppingDistance = 1.5f; 
     public LayerMask obstacleLayer; 
 
     private Rigidbody2D rb;  
     private float distance;         
     private bool canShoot = false;
+    private Vector2 moveDirection;
 
     void Start()
     {
@@ -21,35 +22,44 @@ public class EnemyAI : MonoBehaviour
     }
 
     void FixedUpdate()
+{
+    distance = Vector2.Distance(transform.position, player.transform.position);
+
+    if (distance <= detectionRadius)
     {
-        distance = Vector2.Distance(transform.position, player.transform.position);
+        Debug.Log("✅ Player detected! Moving...");
 
-        if (distance <= detectionRadius && HasLineOfSight())
+        moveDirection = (player.transform.position - transform.position).normalized;
+        float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+
+        if (distance > stoppingDistance)
         {
-            Debug.Log("✅ Player detected! Moving...");
+            Vector2 newPosition = transform.position + (Vector3)(moveDirection * speed * Time.fixedDeltaTime); // Use transform.position here
 
-            Vector2 direction = (player.transform.position - transform.position).normalized;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
-
-            if (distance > stoppingDistance)
+            if (!IsBlocked(newPosition))
             {
-                Vector2 newPosition = rb.position + direction * speed * Time.fixedDeltaTime;
-
-                // ✅ Check for walls before moving
-                if (!IsBlocked(newPosition))
-                {
-                    rb.MovePosition(newPosition);
-                }
+                transform.position = newPosition; // Directly change position
             }
+            else
+            {
+                moveDirection *= -1; // Reverse direction when hitting a wall
+                Debug.Log("🔄 Reversing direction!");
+            }
+        }
 
-            canShoot = true;
-        }
-        else
-        {
-            canShoot = false;
-        }
+        canShoot = true;
     }
+    else
+    {
+        canShoot = false;
+    }
+
+    Debug.Log("Move Direction: " + moveDirection); // Debugging movement direction
+    Debug.Log("Detection Radius: " + detectionRadius);
+    Debug.Log("Has Line of Sight: " + HasLineOfSight());
+}
+
 
     bool HasLineOfSight()
     {
@@ -64,11 +74,18 @@ public class EnemyAI : MonoBehaviour
     bool IsBlocked(Vector2 targetPosition)
     {
         Collider2D hit = Physics2D.OverlapCircle(targetPosition, 0.1f, obstacleLayer);
-        return hit != null;
+        
+        if (hit != null)
+        {
+            Debug.Log("🚧 Enemy blocked by: " + hit.gameObject.name);
+            return true;
+        }
+        
+        return false;
     }
 
     public bool CanShoot()
     {
         return canShoot;
     }
-}
+} 
