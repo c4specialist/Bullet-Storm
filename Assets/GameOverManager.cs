@@ -5,7 +5,8 @@ public class GameOverUI : MonoBehaviour
 {
     public void RestartGame()
     {
-        SceneManager.LoadScene("Level 1");
+        string currentScene = SceneManager.GetActiveScene().name; // Get current level name
+        SceneManager.LoadScene(currentScene);
     }
 
     public void ReturnToMenu()

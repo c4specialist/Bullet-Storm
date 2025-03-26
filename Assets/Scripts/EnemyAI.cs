@@ -15,51 +15,81 @@ public class EnemyAI : MonoBehaviour
     private bool canShoot = false;
     private Vector2 moveDirection;
 
+    private int health; // Enemy Health
+
     void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-        rb.isKinematic = true; // ✅ Use Kinematic Rigidbody
-    }
-
-    void FixedUpdate()
 {
-    distance = Vector2.Distance(transform.position, player.transform.position);
+    rb = GetComponent<Rigidbody2D>();
+    rb.isKinematic = true;
 
-    if (distance <= detectionRadius)
-    {
-        Debug.Log("✅ Player detected! Moving...");
-
-        moveDirection = (player.transform.position - transform.position).normalized;
-        float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
-
-        if (distance > stoppingDistance)
-        {
-            Vector2 newPosition = transform.position + (Vector3)(moveDirection * speed * Time.fixedDeltaTime); // Use transform.position here
-
-            if (!IsBlocked(newPosition))
-            {
-                transform.position = newPosition; // Directly change position
-            }
-            else
-            {
-                moveDirection *= -1; // Reverse direction when hitting a wall
-                Debug.Log("🔄 Reversing direction!");
-            }
-        }
-
-        canShoot = true;
-    }
-    else
-    {
-        canShoot = false;
-    }
-
-    Debug.Log("Move Direction: " + moveDirection); // Debugging movement direction
-    Debug.Log("Detection Radius: " + detectionRadius);
-    Debug.Log("Has Line of Sight: " + HasLineOfSight());
+    StartCoroutine(WaitForDifficultyManager());
 }
 
+IEnumerator WaitForDifficultyManager()
+{
+    while (DifficultyManager.Instance == null)
+    {
+        Debug.LogWarning("⏳ Waiting for DifficultyManager...");
+        yield return null; // Waits until the next frame
+    }
+
+    Debug.Log("🎯 DifficultyManager found, setting enemy health.");
+    health = DifficultyManager.Instance.enemyHealth;
+}
+
+    void FixedUpdate()
+    {
+        distance = Vector2.Distance(transform.position, player.transform.position);
+
+        if (distance <= detectionRadius)
+        {
+            moveDirection = (player.transform.position - transform.position).normalized;
+            float angle = Mathf.Atan2(moveDirection.y, moveDirection.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle - 90f);
+
+            if (distance > stoppingDistance)
+            {
+                Vector2 newPosition = rb.position + moveDirection * speed * Time.fixedDeltaTime;
+
+                // Prevent movement through walls using Raycast
+                RaycastHit2D hit = Physics2D.Raycast(transform.position, moveDirection, speed * Time.fixedDeltaTime, obstacleLayer);
+                if (hit.collider == null)
+                {
+                    rb.MovePosition(newPosition);
+                }
+                else
+                {
+                    Debug.Log("🚧 Enemy is blocked by: " + hit.collider.gameObject.name);
+                    moveDirection = Vector2.zero; 
+                }
+            }
+
+            canShoot = true;
+        }
+        else
+        {
+            canShoot = false;
+        }
+    }
+
+    // Take Damage Function
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        Debug.Log("Enemy took damage! Remaining Health: " + health);
+
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    // Destroy Enemy
+    private void Die()
+    {
+        Debug.Log("💀 Enemy Defeated!");
+        Destroy(gameObject);
+    }
 
     bool HasLineOfSight()
     {
@@ -88,4 +118,4 @@ public class EnemyAI : MonoBehaviour
     {
         return canShoot;
     }
-} 
+}

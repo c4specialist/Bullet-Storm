@@ -9,11 +9,31 @@ public class DifficultySlider : MonoBehaviour
 
     void Start()
     {
-        
+        if (DifficultyManager.Instance == null)
+        {
+            Debug.LogError("❌ DifficultyManager is missing! Make sure it's in the scene.");
+        }
+        else
+        {
+            UpdateDifficulty();
+        }
+
         difficultySlider.minValue = 0;
         difficultySlider.maxValue = 2;
-        difficultySlider.wholeNumbers = true; 
-        UpdateDifficultyText(); 
+        difficultySlider.wholeNumbers = true;
+
+        difficultySlider.onValueChanged.AddListener(delegate { UpdateDifficultyText(); });
+        UpdateDifficultyText();
+    }
+
+    public void UpdateDifficulty()
+    {
+        if (DifficultyManager.Instance != null)
+        {
+            DifficultyManager.Instance.SetDifficulty((DifficultyLevel)(int)difficultySlider.value);
+            Debug.Log("🎯 Difficulty Updated: " + DifficultyManager.Instance.currentDifficulty);
+            Debug.Log("💙 Enemy Health Updated: " + DifficultyManager.Instance.enemyHealth);
+        }
     }
 
     public void UpdateDifficultyText()
@@ -34,4 +54,9 @@ public class DifficultySlider : MonoBehaviour
                 break;
         }
     }
+
+
 }
+
+public enum DifficultyLevel { Easy = 0, Medium = 1, Hard = 2 }
+
